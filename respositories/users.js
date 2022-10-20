@@ -26,7 +26,7 @@ class UsersRepository {
 
     async create(attrs) {
         attrs.id = this.randomId();
-        
+
         const records = await this.getAll(); //to get the most up to date list of users
         records.push(attrs);
 
@@ -39,6 +39,29 @@ class UsersRepository {
 
     randomId(){
         return crypto.randomBytes(4).toString('hex');
+    }
+
+    async getOne(id) {
+        const records = await this.getAll();
+        return records.find(record => record.id === id);
+    }
+
+    async delete(id) {
+        const record = await this.getAll();
+        const filteredRecords = records.filter(record => record.id !== id);
+        await this.writeAll(filteredRecords);
+    }
+
+    async update(id, attrs) {
+        const records = await this.getAll();
+        const record = records.find(record => record.id === id);
+
+        if(!record) {
+            throw new Error(`Record with id ${id} not found`);
+        }
+
+        Object.assign(record, attrs);
+        await this.writeAll(records);
     }
 }
 
