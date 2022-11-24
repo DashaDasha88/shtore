@@ -1,6 +1,7 @@
 const express = require('express');
 const cartsRepo = require('../respositories/carts');
 const productsRepo = require('../respositories/products');
+const cartShowTemplate = require('../views/carts/show');
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ router.post('/cart/products', async (req, res) => {
 
     await cartsRepo.update(cart.id, {
         items: cart.items
-    })
+    });
 
 });
 
@@ -38,7 +39,13 @@ router.get('/cart', async (req, res) => {
 
     for (let item of cart.items) {
         const product = await productsRepo.getOne(item.id);
+
+        //Assign product that we just found to the item property
+        item.product = product;
     }
-})
+
+    res.send(cartShowTemplate({ items: cart.items }));
+
+});
 
 module.exports = router;
